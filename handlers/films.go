@@ -33,3 +33,17 @@ func (f *Films) GetFilmsByTitle(rw http.ResponseWriter, r *http.Request) {
 		http.Error(rw, "Unable to return film", http.StatusInternalServerError)
 	}
 }
+
+func (f *Films) DeleteFilmsByTitle(rw http.ResponseWriter, r *http.Request) {
+	utils.EnableCors(&rw)
+	vars := mux.Vars(r)
+	title := vars["title"]
+	f.l.Printf("Processing DELETE request on /api/films/" + title)
+	res := data.DeleteFilms(f.db, f.l, title)
+	if res {
+		return
+	} else {
+		http.Error(rw, "There is no films with title: "+title, http.StatusNotFound)
+		return
+	}
+}

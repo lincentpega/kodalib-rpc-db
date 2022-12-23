@@ -20,6 +20,7 @@ import (
 type App struct {
 	fh     *handlers.Films
 	ph     *handlers.Person
+	dbh    *handlers.DB
 	Router *mux.Router
 	DB     *sql.DB
 	l      *log.Logger
@@ -34,6 +35,7 @@ func (a *App) Initialize(db_host, db_user, db_name, db_pass, address string, l *
 
 	a.DB = db
 	a.l = l
+	a.dbh = handlers.NewDB(db, l)
 	a.fh = handlers.NewFilms(db, l)
 	a.ph = handlers.NewPerson(db, l)
 	a.Router = mux.NewRouter()
@@ -45,8 +47,14 @@ func (a *App) SetRouter(r *mux.Router) {
 }
 
 func (a *App) initializeRoutes() {
-	a.Router.HandleFunc("/api/films/{title}", a.fh.GetFilmsByTitle).Methods("GET")
-	a.Router.HandleFunc("/api/persons/{name}", a.ph.GetPersonByName).Methods("GET")
+	a.Router.HandleFunc("/api/films/{title}", a.fh.GetFilmsByTitle).Methods(http.MethodGet)
+	a.Router.HandleFunc("/api/persons/{name}", a.ph.GetPersonByName).Methods(http.MethodGet)
+	a.Router.HandleFunc("/api/films/{title}", a.fh.DeleteFilmsByTitle).Methods(http.MethodDelete)
+	a.Router.HandleFunc("/api/persons/{name}", a.ph.DeletePersonsByName).Methods(http.MethodDelete)
+	a.Router.HandleFunc("/api/create_db/{title}", a.dbh.CreateDB).Methods(http.MethodPost)
+	a.Router.HandleFunc("/api/delete_db/{title}", a.dbh.DeleteDB).Methods(http.MethodPost)
+	a.Router.HandleFunc("/api/table/{title}", a.dbh.TruncateTable).Methods(http.MethodDelete)
+	a.Router.HandleFunc("/api/table/all", a.dbh.TruncateAll).Methods(http.MethodDelete)
 }
 
 func (a *App) Run(address string, l *log.Logger) {

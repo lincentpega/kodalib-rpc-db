@@ -78,3 +78,27 @@ func GetFilms(db *sql.DB, title string) (Films, error) {
 
 	return fs, nil
 }
+
+func DeleteFilms(db *sql.DB, l *log.Logger, title string) bool {
+	q := "SELECT * FROM delete_films_by_title_if_exists($1)"
+
+	rows, err := db.Query(q, title)
+	if err != nil {
+		l.Fatal(err)
+	}
+	defer rows.Close()
+
+	var res int
+
+	if !rows.Next() {
+		return false
+	}
+
+	rows.Scan(&res)
+	if res == 0 {
+		return true
+	} else {
+		return false
+	}
+
+}

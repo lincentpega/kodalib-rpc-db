@@ -41,12 +41,12 @@ func (f *Persons) FromJSON(r io.Reader) error {
 	return e.Decode(f)
 }
 
-func GetPersons(db *sql.DB, name string) (Persons, error) {
+func GetPersons(db *sql.DB, l *log.Logger, name string) (Persons, error) {
 	q := "SELECT id, person_imdb_id, name, image, summary, birth_date, death_date, height FROM get_persons_by_name($1);"
 
 	rows, err := db.Query(q, name)
 	if err != nil {
-		log.Fatal(err)
+		l.Fatal(err)
 	}
 	defer rows.Close()
 
@@ -72,4 +72,28 @@ func GetPersons(db *sql.DB, name string) (Persons, error) {
 	}
 
 	return ps, nil
+}
+
+func DeletePersons(db *sql.DB, l *log.Logger, name string) bool {
+	q := "SELECT * FROM delete_persons_by_name_if_exists($1)"
+
+	rows, err := db.Query(q, name)
+	if err != nil {
+		l.Fatal(err)
+	}
+	defer rows.Close()
+
+	var res int
+
+	if !rows.Next() {
+		return false
+	}
+
+	rows.Scan(&res)
+	if res == 0 {
+		return true
+	} else {
+		return false
+	}
+
 }
