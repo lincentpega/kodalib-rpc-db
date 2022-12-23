@@ -18,16 +18,16 @@ func NewFilms(db *sql.DB, l *log.Logger) *Films {
 	return &Films{db, l}
 }
 
-func (f *Films) GetFilmByTitle(rw http.ResponseWriter, r *http.Request) {
+func (f *Films) GetFilmsByTitle(rw http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	f.l.Printf("%v", vars)
 	title := vars["title"]
-	film, err := data.GetFilm(f.db, title)
+	f.l.Printf("Processing GET reqiest on /api/films/" + title)
+	films, err := data.GetFilms(f.db, title)
 	if err != nil {
-		http.Error(rw, "unable to find film with title "+title, http.StatusNotFound)
+		http.Error(rw, "Unable to find film with title: "+title, http.StatusNotFound)
 		return
 	}
-	if err = film.ToJSON(rw); err != nil {
-		http.Error(rw, "unable to return film", http.StatusInternalServerError)
+	if err = films.ToJSON(rw); err != nil {
+		http.Error(rw, "Unable to return film", http.StatusInternalServerError)
 	}
 }

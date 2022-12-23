@@ -19,6 +19,7 @@ import (
 
 type App struct {
 	fh     *handlers.Films
+	ph     *handlers.Person
 	Router *mux.Router
 	DB     *sql.DB
 	l      *log.Logger
@@ -34,6 +35,7 @@ func (a *App) Initialize(db_host, db_user, db_name, db_pass, address string, l *
 	a.DB = db
 	a.l = l
 	a.fh = handlers.NewFilms(db, l)
+	a.ph = handlers.NewPerson(db, l)
 	a.Router = mux.NewRouter()
 	a.initializeRoutes()
 }
@@ -43,7 +45,8 @@ func (a *App) SetRouter(r *mux.Router) {
 }
 
 func (a *App) initializeRoutes() {
-	a.Router.HandleFunc("/api/films/{title}", a.fh.GetFilmByTitle).Methods("GET")
+	a.Router.HandleFunc("/api/films/{title}", a.fh.GetFilmsByTitle).Methods("GET")
+	a.Router.HandleFunc("/api/persons/{name}", a.ph.GetPersonByName).Methods("GET")
 }
 
 func (a *App) Run(address string, l *log.Logger) {

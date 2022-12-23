@@ -46,10 +46,8 @@ func (f *Films) FromJSON(r io.Reader) error {
 	return e.Decode(f)
 }
 
-func GetFilm(db *sql.DB, title string) (*Film, error) {
-	q := "SELECT * FROM get_films_by_title($1) AS (id int, imdb_id text, title text, poster text," +
-		" year smallint, duration text, plot text, imdb_rating text, kodalib_rating text, budget text," +
-		"gross_world text, youtube_trailer text, ThumbnailUrl text);"
+func GetFilms(db *sql.DB, title string) (Films, error) {
+	q := "SELECT * FROM get_films_by_title($1);"
 
 	rows, err := db.Query(q, title)
 	if err != nil {
@@ -57,19 +55,26 @@ func GetFilm(db *sql.DB, title string) (*Film, error) {
 	}
 	defer rows.Close()
 
-	if !rows.Next() {
+	var fs Films
+
+	isAnyMore := rows.Next()
+	if !isAnyMore {
 		return nil, fmt.Errorf("unable to find film with title: %s", title)
 	}
+	for isAnyMore {
+		var f Film
+		rows.Scan(&f.Id, &f.ImdbId, &f.Title, &f.Poster, &f.Year, &f.Duration,
+			&f.Plot, &f.ImdbRating, &f.KodalibRating, &f.Budget, &f.GrossWorldwide,
+			&f.YoutubeTrailer, &f.ThumbnailUrl)
 
-	var f Film
-	rows.Scan(&f.Id, &f.ImdbId, &f.Title, &f.Poster, &f.Year, &f.Duration,
-		&f.Plot, &f.ImdbRating, &f.KodalibRating, &f.Budget, &f.GrossWorldwide,
-		&f.YoutubeTrailer, &f.ThumbnailUrl)
+		// bacause of non-void stored function call, which returns sth with id 0, if film not found
+		if f.Id == 0 {
+			return nil, fmt.Errorf("unable to find film with title: %s", title)
+		}
 
-	// bacause of non-void stored function call, which returns sth with id 0, if film not found
-	if f.Id == 0 {
-		return nil, fmt.Errorf("unable to find film with title: %s", title)
+		fs = append(fs, f)
+		isAnyMore = rows.Next()
 	}
 
-	return &f, nil
+	return fs, nil
 }
