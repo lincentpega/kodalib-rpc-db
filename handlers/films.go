@@ -7,6 +7,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/lincentpega/kodalib-rpc-db/data"
+	"github.com/lincentpega/kodalib-rpc-db/utils"
 )
 
 type Films struct {
@@ -19,6 +20,7 @@ func NewFilms(db *sql.DB, l *log.Logger) *Films {
 }
 
 func (f *Films) GetFilmsByTitle(rw http.ResponseWriter, r *http.Request) {
+	utils.EnableCors(&rw)
 	vars := mux.Vars(r)
 	title := vars["title"]
 	f.l.Printf("Processing GET reqiest on /api/films/" + title)

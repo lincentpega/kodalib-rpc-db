@@ -7,6 +7,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/lincentpega/kodalib-rpc-db/data"
+	"github.com/lincentpega/kodalib-rpc-db/utils"
 )
 
 type Person struct {
@@ -19,6 +20,7 @@ func NewPerson(db *sql.DB, l *log.Logger) *Person {
 }
 
 func (p *Person) GetPersonByName(rw http.ResponseWriter, r *http.Request) {
+	utils.EnableCors(&rw)
 	vars := mux.Vars(r)
 	name := vars["name"]
 	p.l.Printf("Processing GET reqiest on /api/persons/" + name)
