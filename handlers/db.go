@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/lincentpega/kodalib-rpc-db/utils"
 )
 
 type DB struct {
@@ -18,6 +19,7 @@ func NewDB(db *sql.DB, l *log.Logger) *DB {
 }
 
 func (db *DB) CreateDB(rw http.ResponseWriter, r *http.Request) {
+	utils.EnableCors(&rw)
 	vars := mux.Vars(r)
 	title := vars["title"]
 
@@ -31,6 +33,7 @@ func (db *DB) CreateDB(rw http.ResponseWriter, r *http.Request) {
 }
 
 func (db *DB) DeleteDB(rw http.ResponseWriter, r *http.Request) {
+	utils.EnableCors(&rw)
 	vars := mux.Vars(r)
 	title := vars["title"]
 
@@ -43,6 +46,7 @@ func (db *DB) DeleteDB(rw http.ResponseWriter, r *http.Request) {
 }
 
 func (db *DB) TruncateTable(rw http.ResponseWriter, r *http.Request) {
+	utils.EnableCors(&rw)
 	vars := mux.Vars(r)
 	title := vars["title"]
 
@@ -56,6 +60,7 @@ func (db *DB) TruncateTable(rw http.ResponseWriter, r *http.Request) {
 }
 
 func (db *DB) TruncateAll(rw http.ResponseWriter, r *http.Request) {
+	utils.EnableCors(&rw)
 	q := "SELECT * FROM truncate_all()"
 
 	if _, err := db.db.Query(q); err != nil {
