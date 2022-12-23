@@ -26,6 +26,7 @@ func (f *Films) GetFilmsByTitle(rw http.ResponseWriter, r *http.Request) {
 	f.l.Printf("Processing GET reqiest on /api/films/" + title)
 	films, err := data.GetFilms(f.db, title)
 	if err != nil {
+		f.l.Panic(err)
 		http.Error(rw, "Unable to find film with title: "+title, http.StatusNotFound)
 		return
 	}

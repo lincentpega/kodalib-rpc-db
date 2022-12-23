@@ -47,11 +47,12 @@ func (f *Films) FromJSON(r io.Reader) error {
 }
 
 func GetFilms(db *sql.DB, title string) (Films, error) {
-	q := "SELECT * FROM get_films_by_title($1);"
+	q := "SELECT id, imdb_id, title, poster, year, duration, plot, imdb_rating, kodalib_rating, budget, gross_worldwide, youtube_trailer, \"ThumbnailUrl\" FROM get_films_by_title($1);"
 
 	rows, err := db.Query(q, title)
 	if err != nil {
-		log.Fatal(err)
+		err = fmt.Errorf("unable to retreive films, got error: %v", err)
+		return nil, err
 	}
 	defer rows.Close()
 
