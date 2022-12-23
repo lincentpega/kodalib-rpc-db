@@ -61,7 +61,7 @@ func GetPersons(db *sql.DB, name string) (Persons, error) {
 		var p Person
 		rows.Scan(&p.Id, &p.PersonImdbId, &p.Name, &p.Image, &p.Summary, &p.BirthDate, &p.DeathDate, &p.Height)
 
-		// bacause of non-void stored function call, which returns sth with id 0, if film not found
+		// bacause of non-void stored function call, which returns sth with id 0, if person not found
 		if p.Id == 0 {
 			return nil, fmt.Errorf("unable to find person with name : %s", name)
 		}
