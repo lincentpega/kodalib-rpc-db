@@ -51,8 +51,8 @@ func (a *App) initializeRoutes() {
 	a.Router.HandleFunc("/api/persons/{name}", a.ph.GetPersonByName).Methods(http.MethodGet)
 	a.Router.HandleFunc("/api/films/{title}", a.fh.DeleteFilmsByTitle).Methods(http.MethodDelete)
 	a.Router.HandleFunc("/api/persons/{name}", a.ph.DeletePersonsByName).Methods(http.MethodDelete)
-	a.Router.HandleFunc("/api/create_db/{title}", a.dbh.CreateDB).Methods(http.MethodPost)
-	a.Router.HandleFunc("/api/delete_db/{title}", a.dbh.DeleteDB).Methods(http.MethodPost)
+	a.Router.HandleFunc("/api/create_db/{title}", a.dbh.CreateDB).Methods(http.MethodGet)
+	a.Router.HandleFunc("/api/delete_db/{title}", a.dbh.DeleteDB).Methods(http.MethodGet)
 	a.Router.HandleFunc("/api/table/{title}", a.dbh.TruncateTable).Methods(http.MethodDelete)
 	a.Router.HandleFunc("/api/table/all", a.dbh.TruncateAll).Methods(http.MethodDelete)
 }
