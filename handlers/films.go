@@ -19,14 +19,18 @@ func NewFilms(db *sql.DB, l *log.Logger) *Films {
 	return &Films{db, l}
 }
 
+func (f *Films) GetFilms(rw http.ResponseWriter, r *http.Request) {
+	utils.EnableCors(&rw)
+
+}
+
 func (f *Films) GetFilmsByTitle(rw http.ResponseWriter, r *http.Request) {
 	utils.EnableCors(&rw)
 	vars := mux.Vars(r)
 	title := vars["title"]
 	f.l.Printf("Processing GET reqiest on /api/films/" + title)
-	films, err := data.GetFilms(f.db, title)
+	films, err := data.GetFilmsByTitle(f.db, title)
 	if err != nil {
-		f.l.Panic(err)
 		http.Error(rw, "Unable to find film with title: "+title, http.StatusNotFound)
 		return
 	}

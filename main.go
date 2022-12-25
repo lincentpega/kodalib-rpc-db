@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 
@@ -25,4 +26,6 @@ func main() {
 	)
 
 	a.Run(":"+os.Getenv("PORT"), l)
+	p := new([3]int)
+	fmt.Printf("%v", *p)
 }

@@ -27,6 +27,7 @@ type App struct {
 
 func (a *App) Initialize(db_host, db_user, db_name, db_pass, address string, l *log.Logger) {
 	cs := fmt.Sprintf("host=%s user=%s dbname=%s password=%s sslmode=disable", db_host, db_user, db_name, db_pass)
+
 	db, err := sql.Open("postgres", cs)
 	if err != nil {
 		log.Fatal(err)
@@ -41,10 +42,6 @@ func (a *App) Initialize(db_host, db_user, db_name, db_pass, address string, l *
 	a.initializeRoutes()
 }
 
-func (a *App) SetRouter(r *mux.Router) {
-	a.Router = r
-}
-
 func (a *App) initializeRoutes() {
 	a.Router.HandleFunc("/api/films/{title}", a.fh.GetFilmsByTitle).Methods(http.MethodGet)
 	a.Router.HandleFunc("/api/persons/{name}", a.ph.GetPersonByName).Methods(http.MethodGet)
@@ -54,6 +51,7 @@ func (a *App) initializeRoutes() {
 	a.Router.HandleFunc("/api/delete_db/{title}", a.dbh.DeleteDB).Methods(http.MethodGet)
 	a.Router.HandleFunc("/api/table/{title}", a.dbh.TruncateTable).Methods(http.MethodDelete)
 	a.Router.HandleFunc("/api/table/all", a.dbh.TruncateAll).Methods(http.MethodDelete)
+	a.Router.HandleFunc("/api/films", a.fh.GetFilms).Methods(http.MethodGet)
 }
 
 func (a *App) Run(address string, l *log.Logger) {
@@ -70,7 +68,7 @@ func (a *App) Run(address string, l *log.Logger) {
 	}
 
 	go func() {
-		l.Println("Starting server on port " + os.Getenv("PORT"))
+		l.Println("Starting server on port " + address)
 		if err := s.ListenAndServe(); err != nil {
 			log.Println(err)
 		}

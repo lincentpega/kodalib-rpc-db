@@ -46,8 +46,34 @@ func (f *Films) FromJSON(r io.Reader) error {
 	return e.Decode(f)
 }
 
-func GetFilms(db *sql.DB, title string) (Films, error) {
-	q := "SELECT id, imdb_id, title, poster, year, duration, plot, imdb_rating, kodalib_rating, budget, gross_worldwide, youtube_trailer, \"ThumbnailUrl\" FROM get_films_by_title($1);"
+func GetAllFilms(db *sql.DB) (Films, error) {
+	q := `SELECT * FROM 
+	id, imdb_id, title, poster, year, duration, plot, 
+	imdb_rating, kodalib_rating, budget, gross_worldwide, youtube_trailer, "ThumbnailUrl"`
+
+	rows, err := db.Query(q)
+	if err != nil {
+		err = fmt.Errorf("unable to retreive films, got error: %v", err)
+		return nil, err
+	}
+
+	var films Films
+
+	for rows.Next() {
+		var f Film
+		rows.Scan(&f.Id, &f.ImdbId, &f.Title, &f.Poster, &f.Year, &f.Duration,
+			&f.Plot, &f.ImdbRating, &f.KodalibRating, &f.Budget, &f.GrossWorldwide,
+			&f.YoutubeTrailer, &f.ThumbnailUrl)
+		films = append(films, f)
+	}
+
+	return films, nil
+}
+
+func GetFilmsByTitle(db *sql.DB, title string) (Films, error) {
+	q := `SELECT id, imdb_id, title, poster, year, duration, plot, imdb_rating, kodalib_rating, budget, gross_worldwide, youtube_trailer, "ThumbnailUrl" 
+	FROM films 
+	WHERE films.title = $1`
 
 	rows, err := db.Query(q, title)
 	if err != nil {
@@ -67,11 +93,6 @@ func GetFilms(db *sql.DB, title string) (Films, error) {
 		rows.Scan(&f.Id, &f.ImdbId, &f.Title, &f.Poster, &f.Year, &f.Duration,
 			&f.Plot, &f.ImdbRating, &f.KodalibRating, &f.Budget, &f.GrossWorldwide,
 			&f.YoutubeTrailer, &f.ThumbnailUrl)
-
-		// bacause of non-void stored function call, which returns sth with id 0, if film not found
-		if f.Id == 0 {
-			return nil, fmt.Errorf("unable to find film with title: %s", title)
-		}
 
 		fs = append(fs, f)
 		isAnyMore = rows.Next()
