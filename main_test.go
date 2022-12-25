@@ -13,9 +13,7 @@ import (
 var a App
 
 func TestMain(m *testing.M) {
-	if err := godotenv.Load(); err != nil {
-		log.Fatal(err)
-	}
+	godotenv.Load()
 
 	a = App{}
 	a.Initialize(

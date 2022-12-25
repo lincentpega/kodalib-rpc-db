@@ -9,9 +9,7 @@ import (
 )
 
 func main() {
-	if err := godotenv.Load(); err != nil {
-		log.Fatal(err)
-	}
+	godotenv.Load()
 
 	l := log.New(os.Stdout, "koda-db ", log.LstdFlags)
 
