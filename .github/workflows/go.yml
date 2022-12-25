@@ -10,8 +10,13 @@ on:
     branches: [ "master" ]
 
 jobs:
-
   build:
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_PASSWORD: postgres
+          
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -25,7 +30,10 @@ jobs:
       run: go build -v ./...
 
     - name: Test
-      run: |
-        docker pull postgres:latest
-        docker run -d -p5432:5432 postgres:latest
-        go test -v ./...
+      run: go test -v ./...
+      env:
+        TEST_DB_HOST: localhost
+        TEST_DB_USER: postgres
+        TEST_DB_PASS: postgres
+        TEST_DB_NAME: postgres
+        PORT: 8010
