@@ -16,6 +16,9 @@ jobs:
         image: postgres
         env:
           POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+
           
     runs-on: ubuntu-latest
     steps:
